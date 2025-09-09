@@ -21,20 +21,26 @@ class JwtFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        if ("OPTIONS" == request.method) {
+            response.status = HttpServletResponse.SC_OK
+            filterChain.doFilter(request, response)
+            return
+        }
         val header = request.getHeader("Authorization")
-        logger.info(header)
         if(header != null && header.startsWith("Bearer ")) {
             val token = header.substring(7)
             if(jwtUtil.isTokenValid(token)) {
                 try{
                     logger.info("jwt filter : authentication success")
                     val username = jwtUtil.parseToken(token)["username"] as String
-
+                    logger.info("username : $username")
                     val authentication = UsernamePasswordAuthenticationToken(
                         username, null,
                         Collections.singleton(SimpleGrantedAuthority("ROLE_USER"))
                     )
                     SecurityContextHolder.getContext().authentication = authentication
+
+
                 }catch (e : Exception) {
                     logger.error(e.message)
                     SecurityContextHolder.clearContext()

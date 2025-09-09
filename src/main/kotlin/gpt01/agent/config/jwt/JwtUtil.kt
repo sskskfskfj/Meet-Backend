@@ -15,7 +15,7 @@ import java.util.*
 class JwtUtil {
     @Value("\${jwt.secret-key}")
     private lateinit var key : String
-    private val expiration : Long = 60000L
+    private val expiration : Long = 1000 * 60 * 60
     private lateinit var secretKey : Key
 
     @PostConstruct
@@ -23,9 +23,9 @@ class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(key.toByteArray()))
     }
     /*
-    jwt 생성 로직 username, email기반
+    jwt 생성 로직 username
      */
-    fun generateToken(username : String, email : String) : String {
+    fun generateToken(username : String) : String {
         val now = System.currentTimeMillis()
         return Jwts.builder()
             .setSubject(username)
@@ -34,7 +34,6 @@ class JwtUtil {
             .addClaims(
                 mapOf(
                     "username" to username,
-                    "email" to email,
                 )
             )
             .signWith(this.secretKey)

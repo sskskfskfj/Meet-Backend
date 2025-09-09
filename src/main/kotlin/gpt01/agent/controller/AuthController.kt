@@ -19,9 +19,9 @@ class AuthController {
     fun logout(response: HttpServletResponse): ResponseEntity<ResponseDto<String>> {
         logger.info("logout request")
         val cookie = ResponseCookie.from("access-token", "")
-            .httpOnly(true)
-            .secure(false) // 배포 시 true
-            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(true) // 배포 시 true
+            .sameSite("None")
             .path("/")
             .maxAge(0)
             .build()

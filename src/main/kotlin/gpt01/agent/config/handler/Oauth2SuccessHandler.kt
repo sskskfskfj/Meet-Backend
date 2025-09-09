@@ -28,19 +28,19 @@ class Oauth2SuccessHandler(
     ){
         logger.info("from successHandler")
         val user = authentication.principal as CustomOauth2User
-        val accessToken : String = jwtUtil.generateToken(user.name, user.getEmail())
+        val accessToken : String = jwtUtil.generateToken(user.name)
         logger.info(accessToken)
 
         val cookie = ResponseCookie.from("access-token", accessToken)
-            .httpOnly(false)     // 보안 위해 실제 배포 시 true 권장
-            .secure(false)       // HTTPS 환경이면 true
-            .sameSite("Lax")    // 크로스 도메인 허용
+            .httpOnly(false)
+            .secure(true)       // openssl 인증서 적용
+            .sameSite("None")
             .path("/")
             .maxAge(Duration.ofMinutes(10))
             .build()
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-        response.sendRedirect("http://localhost:5173")
+        response.sendRedirect("https://localhost:5173")
 
     }
 }
