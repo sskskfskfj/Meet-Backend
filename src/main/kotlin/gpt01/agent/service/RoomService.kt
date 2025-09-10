@@ -2,6 +2,7 @@ package gpt01.agent.service
 
 import gpt01.agent.dto.room.CreateRoomDto
 import gpt01.agent.dto.ResponseDto
+import gpt01.agent.dto.room.DeleteRoomDto
 import gpt01.agent.dto.room.JoinRoomDto
 import gpt01.agent.dto.room.LeaveRoomDto
 import gpt01.agent.entity.ParticipantsEntity
@@ -32,13 +33,13 @@ class RoomService (
         logger.info("Creating room $roomName by $username")
         if(roomRepository.findRoomEntityByRoomName(roomName) == null){
             val user = userRepository.findByUsername(username)!!
-            val room : RoomEntity = RoomEntity.to(roomName, request.maxParticipants)
+            val room : RoomEntity = RoomEntity.to(roomName, request.maxParticipants, username)
 
             logger.info("roomName : ${room.roomName}")
             roomRepository.save(room)
             participantsRepository.save(ParticipantsEntity.to(user, room))
 
-            return ResponseDto("room $roomName created by $username")
+            return ResponseDto(username)
         }else{
             return ResponseDto("room $roomName already exists")
         }
@@ -80,11 +81,24 @@ class RoomService (
         if(participants == null){
             return ResponseDto("already leave room")
         }else{
-            participantsRepository.delete(participants)
-        }
+            room.currentParticipants--
 
-        room.currentParticipants--
-        return ResponseDto("room ${request.roomName} left")
+            roomRepository.save(room)
+            participantsRepository.delete(participants)
+            return ResponseDto("room ${request.roomName} left")
+        }
+    }
+
+    @Transactional
+    fun deleteRoom(request : DeleteRoomDto) : ResponseDto<String> {
+        val room = roomRepository.findRoomEntityByRoomName(request.roomName)
+
+        if(participantsRepository.findByRoom(room!!) == null && room.createdUser == request.createUser){
+            roomRepository.delete(room)
+            return ResponseDto("delete room ${request.roomName}")
+        }else {
+            return ResponseDto("user exists")
+        }
     }
 
     /*

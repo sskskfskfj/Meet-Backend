@@ -18,15 +18,15 @@ class LiveKitController(
     livekit에 접근할 때 사용할 jwt 생성 로직
      */
     @PostMapping("/token")
-    fun getToken(@RequestBody params: LiveKitRequestDto): ResponseEntity<Map<String, String>> {
+    fun getToken(@RequestBody params: LiveKitRequestDto): ResponseEntity<ResponseDto<Map<String, String>>> {
         logger.info("request from user")
         logger.info("request user : {}", SecurityContextHolder.getContext().authentication.name)
         val request = mapOf(
             "roomName" to params.roomName,
             "participant" to params.username
         )
-        val token : Map<String, String> = liveKitService.createToken(request).message
-        logger.info("created token: $token")
+        val token = liveKitService.createToken(request)
+        logger.info("created token: ${token.message}")
         return ResponseEntity.ok().body(token)
     }
 

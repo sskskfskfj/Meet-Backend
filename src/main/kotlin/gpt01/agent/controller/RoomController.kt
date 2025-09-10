@@ -2,6 +2,7 @@ package gpt01.agent.controller
 
 import gpt01.agent.dto.room.CreateRoomDto
 import gpt01.agent.dto.ResponseDto
+import gpt01.agent.dto.room.DeleteRoomDto
 import gpt01.agent.dto.room.JoinRoomDto
 import gpt01.agent.dto.room.LeaveRoomDto
 import gpt01.agent.entity.RoomEntity
@@ -64,6 +65,7 @@ class RoomController(
     @PostMapping("/leave")
     fun leaveRoom(@RequestBody leaveRoomRequest : LeaveRoomDto) : ResponseEntity<ResponseDto<String>> {
         try{
+            logger.info("leave request")
             return ResponseEntity.ok().body(roomService.leaveRoom(leaveRoomRequest))
         }catch (e: Exception){
             logger.error(e.message)
@@ -71,6 +73,12 @@ class RoomController(
                 ResponseDto("error leaving room")
             )
         }
+    }
+
+    @PostMapping("/delete")
+    fun deleteRoom(@RequestBody deleteRoomRequest: DeleteRoomDto) : ResponseEntity<ResponseDto<String>> {
+        logger.info("delete request")
+        return ResponseEntity.ok().body(roomService.deleteRoom(deleteRoomRequest))
     }
 
     /*

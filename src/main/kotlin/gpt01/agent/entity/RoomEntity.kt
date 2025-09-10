@@ -23,11 +23,19 @@ class RoomEntity(
 
     @Column(name = "created")
     val createdTime : Long = System.currentTimeMillis(),
+
+    @Column(name = "createdUser")
+    val createdUser : String = ""
 ){
     companion object{
         fun to(
             roomName : String,
-            maxParticipants : Int
-        ) : RoomEntity = RoomEntity(roomName = roomName, maxParticipants = maxParticipants)
+            maxParticipants : Int,
+            createdUser: String,
+        ) : RoomEntity = RoomEntity(
+            roomName = roomName,
+            maxParticipants = maxParticipants,
+            createdUser = createdUser,
+        )
     }
 }
